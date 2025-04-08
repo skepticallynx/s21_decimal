@@ -1,0 +1,22 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+stages:
+  - lint
+  - notify
+
+lint_clang_format:
+  stage: lint
+  script:
+    - cp materials/linters/.clang-format src/.clang-format
+    - find src -name '*.c' -o -name '*.h' | xargs clang-format -style=file --dry-run --Werror
+  rules:
+    - when: on_success
+
+notify_telegram:
+  stage: notify
+  script:
+    - bash notify.sh
+  rules:
+    - when: on_success
